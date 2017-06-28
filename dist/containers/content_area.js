@@ -91,7 +91,7 @@ var dataComposer = exports.dataComposer = function dataComposer(_ref, onData) {
       Meteor = _context.Meteor,
       Collections = _context.Collections,
       i18n = _context.i18n;
-  console.log('in jbl2 manuldraft');
+  console.log('in jbl3 manuldraft');
   var contentLoaded = Meteor.subscribe('contents.one', contentId).ready();
   var locale = i18n.getLocale();
   var content = Collections.Contents.findOne(contentId);
