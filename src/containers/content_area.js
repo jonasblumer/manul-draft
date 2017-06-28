@@ -12,6 +12,7 @@ export const dataComposer = (
   const { Meteor, Collections, i18n } = context();
   const contentLoaded = Meteor.subscribe('contents.one', contentId).ready();
   const locale = i18n.getLocale();
+console.log('loading, methinks';
   const content = Collections.Contents.findOne(contentId);
   if (contentLoaded) {
     const initialEditorState = editorStateFromRaw(
