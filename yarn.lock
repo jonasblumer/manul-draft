@@ -2008,9 +2008,9 @@ loose-envify@^1.0.0, loose-envify@^1.3.1:
   dependencies:
     js-tokens "^3.0.0"
 
-megadraft@^0.4.26:
+"megadraft@https://github.com/panter/megadraft#24e15cc5ec7699182f46f05d90bc9e5fbef4ee3b":
   version "0.4.26"
-  resolved "https://registry.yarnpkg.com/megadraft/-/megadraft-0.4.26.tgz#d4d88c888e6f6592c6ae24f90563089867437ff1"
+  resolved "https://github.com/panter/megadraft#24e15cc5ec7699182f46f05d90bc9e5fbef4ee3b"
   dependencies:
     backstage-modal "^0.2.5"
     classnames "^2.2.5"

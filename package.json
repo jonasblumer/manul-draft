@@ -52,7 +52,7 @@
   "main": "./dist/index.js",
   "dependencies": {
     "immutable": "^3.8.1",
-    "megadraft": "^0.4.26",
+    "megadraft": "https://github.com/panter/megadraft#24e15cc5ec7699182f46f05d90bc9e5fbef4ee3b",
     "react-draggable": "^2.2.6",
     "react-measure": "^1.4.6",
     "react-overlays": "^0.8.0",
