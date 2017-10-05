@@ -1,6 +1,10 @@
-import React from 'react';
 import { MegadraftEditor as MegadraftEditorOrg } from 'megadraft';
+import { compose, withState } from 'recompose';
+import Measure from 'react-measure';
+import React from 'react';
+
 import AreaActionsToolbar from './area_actions_toolbar';
+import DraggableWindow from './draggable_window';
 
 // quickfix for https://github.com/globocom/megadraft/issues/97
 class MegadraftEditor extends MegadraftEditorOrg {
@@ -29,7 +33,12 @@ const Styles = ({ highlightEditable, isEditing }) =>
    })
 ;
 
-const ContentArea = ({
+const enhance = compose(
+  withState('dimensions', 'setDimensions', () => ({ top: 0, left: 0, width: 100, height: 100 })),
+  withState('editorHasFocus', 'setEditorHasFocus', false),
+);
+
+const ContentArea = enhance(({
     className,
     style,
     canEdit,
@@ -49,44 +58,78 @@ const ContentArea = ({
     megadraftBlockPlugins = [],
     copyLocales = [],
     copyFromLocale,
+    setDimensions,
+    dimensions,
+    editorHasFocus,
+    setEditorHasFocus,
   }) => {
   const styles = Styles({ highlightEditable, isEditing });
 
+  const renderEditor = readOnly => (
+    <MegadraftEditor
+      key={`contentId${isEditing ? '_editing' : ''}`} // force rerender
+      actions={megadraftActions}
+      plugins={megadraftBlockPlugins}
+      readOnly={readOnly}
+      editorState={editorState}
+      entityInputs={entityInputs}
+      blockRenderMap={blockRenderMap}
+      onChange={setEditorState}
+    />
+  );
+
+
   return (
-    <div style={style} className={className}>
-      <div
-        style={styles.base}
-        onClick={() => canEdit && highlightEditable && startEditing()}
-      >
-        <div style={highlightEditable ? { pointerEvents: 'none' } : null}>
-          {isEditing && (
-          <AreaActionsToolbar
-            saveAndClose={saveAndClose}
-            saveAndEdit={saveAndEdit}
-            cancelEditing={cancelEditing}
-            locale={locale}
-            copyLocales={copyLocales}
-            copyFromLocale={copyFromLocale}
-          />
+    <Measure
+      // shouldMeasure={isEditing}
+      onMeasure={setDimensions}
+    >
+      <div style={style} className={className}>
+        <div
+          style={styles.base}
+          onClick={() => canEdit && highlightEditable && startEditing()}
+        >
+          <div style={highlightEditable ? { pointerEvents: 'none' } : null}>
+            {isEditing && (
+            <DraggableWindow
+              disableDragging={editorHasFocus}
+              x={Math.max(20, dimensions.left)}
+              y={Math.max(20, dimensions.top)}
+              /* global window*/
+              width={Math.max(280, Math.min(window.innerWidth - 40, dimensions.width))}
+              height={Math.max(280, Math.min(window.innerHeight - 40, dimensions.height))}
+            >
+              <div
+                onFocus={() => setEditorHasFocus(true)}
+
+                onBlur={() => setEditorHasFocus(false)}
+                className="megadraft-floating-window" style={{
+                  display: 'flex',
+                  cursor: 'text',
+                  flexDirection: 'column',
+                  height: 'calc(100% - 50px)',
+                }}
+              >
+                {renderEditor(blockPluginDialogIsActive || !canEdit || !isEditing)}
+                <AreaActionsToolbar
+                  saveAndClose={saveAndClose}
+                  saveAndEdit={saveAndEdit}
+                  cancelEditing={cancelEditing}
+                  locale={locale}
+                  copyLocales={copyLocales}
+                  copyFromLocale={copyFromLocale}
+                />
+              </div>
+            </DraggableWindow>
       )}
-          <MegadraftEditor
-            key={`contentId${isEditing ? '_editing' : ''}`} // force rerender
-            actions={megadraftActions}
-            plugins={megadraftBlockPlugins}
-            readOnly={blockPluginDialogIsActive || !canEdit || !isEditing}
-            editorState={editorState}
-            entityInputs={entityInputs}
-            blockRenderMap={blockRenderMap}
-            onChange={(state) => {
-              setEditorState(state);
-            }}
-          />
-          <div style={{ clear: 'both' }} />
+            {renderEditor(true)}
+            <div style={{ clear: 'both' }} />
+          </div>
         </div>
       </div>
-    </div>
+    </Measure>
   );
-};
+});
 
 
 ContentArea.displayName = 'ContentArea';
